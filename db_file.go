@@ -31,9 +31,9 @@ func newInternal(fileName string) (*DBFile, error) {
 }
 
 // NewDBFile 创建一个新的数据文件
-func NewDBFile(filename string) (*DBFile, error) {
+func NewDBFile(dirname, filename string) (*DBFile, error) {
 	// 加载数据文件
-	dirAbsPath, err := filepath.Abs(dbDir)
+	dirAbsPath, err := filepath.Abs(dirname)
 	if err != nil {
 		return nil, err
 	}
