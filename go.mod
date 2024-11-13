@@ -1,3 +1,3 @@
 module github.com/etudiez-dur/minidb
 
-go 1.14
+go 1.23

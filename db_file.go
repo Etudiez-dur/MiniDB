@@ -2,7 +2,6 @@ package minidb
 
 import (
 	"os"
-	"path/filepath"
 	"sync"
 )
 
@@ -31,20 +30,13 @@ func newInternal(fileName string) (*DBFile, error) {
 }
 
 // NewDBFile 创建一个新的数据文件
-func NewDBFile(dirname, filename string) (*DBFile, error) {
-	// 加载数据文件
-	dirAbsPath, err := filepath.Abs(dirname)
-	if err != nil {
-		return nil, err
-	}
-	fileName := filepath.Join(dirAbsPath, filename)
-	return newInternal(fileName)
+func NewDBFile(dbName string) (*DBFile, error) {
+	return newInternal(dbName)
 }
 
 // NewMergeDBFile 新建一个合并时的数据文件
-func NewMergeDBFile(path, dbname string) (*DBFile, error) {
-	fileName := filepath.Join(path, dbname+".merge")
-	return newInternal(fileName)
+func NewMergeDBFile(dbname string) (*DBFile, error) {
+	return newInternal(dbname + ".merge")
 }
 
 // Read 从 offset 处开始读取
@@ -74,6 +66,15 @@ func (df *DBFile) Read(offset int64) (e *Entry, err error) {
 			return
 		}
 		e.Value = value
+	}
+
+	offset += int64(e.ValueSize)
+	if e.BucketSize > 0 {
+		bucket := make([]byte, e.BucketSize)
+		if _, err = df.File.ReadAt(bucket, offset); err != nil {
+			return
+		}
+		e.Bucket = bucket
 	}
 	return
 }
